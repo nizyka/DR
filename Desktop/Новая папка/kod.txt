@@ -1,0 +1,134 @@
+private void Change_Click(object sender, ReutedEventArgs e)
+{
+  OpenFileDialog openFileDialog=new OpenFileDialog();
+  openFileDialog.Filter="Image File|*.png;*.jpg;*.jepg;
+  if(openFileDialog.ShowDialog()==true)
+   { 
+     try
+     {
+         File.Copy(openFileDialog.FileName, "image/" +System.IO.Path.GetFileName(openFileDialog.FileName), true);
+         vladelec.image=System.IO.Path.GetFileName(openFileDialog.FileName);
+         Entities.GetContext().SaveChanges();
+         Entities.GetContext().ChangeTracker.Entries().ToList().ForEach(p=>p.Reload());
+         try
+         {
+            image_profiel.Source = new BitmapImage(new Uri(System.IO.Path.GetFullPath("image/" +vladelec.image)));
+         }
+         catch (IOException ex)
+         {
+            MassageBox.Show(ex.Massage); 
+         }
+     }
+     catch (IOException ex)
+     {
+          MassageBox.Show(ex.Massage); 
+     }
+
+}
+
+
+
+2
+<Grid>
+      <Label x:Name="add_label" Content="Добавить..." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FonWeight="Bold" FontSize="20"/>
+      <Label x:Name="data_post_label" Content="Дата поставки" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Foreground="Gray"/>
+      <Label x:Name="postavshik_label" Content="Организация" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top" Foreground="Gray"/>
+      <Label x:Name="name_shop_label" Content="Название магазина" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="Gray"/>
+      <DatePicker Name="datatpostDatePicker" HorizontalAlignment="Left" Margin="171,54,0,0" VerticalAlignment="Top" Foreground="Gray"/>
+      <ComboBox x:Name="postavschikComboBox" DisplayMemberPath="info" HorizontalAlignment="Left" Margin="171,70,0,0" VerticalAlignment="Top" Width="124"/>
+      <ComboBox x:Name="nameComboBox" DisplayMemberPath="info" HorizontalAlignment="Left" Margin="171,90,0,0" VerticalAlignment="Top" Width="124"/>
+      <Button x:Name="add_button" Content="добавить" HorizontalAlignment="Left" Margin="98,196,0,0" VerticalAlignment="Top" Width="106" Height="28" Click="Edit_button"/>
+    </Grid>
+
+3
+private void Edit_button_Click(object sender, RoutedEventArgs e)
+{
+  StringBuilder errors=new  StringBuilder();
+  if(postavschikComboBox.SelectedDate==null)
+    errors.AppendLine("укажите постващика");
+  if(datatpostDatePicker.SelectedDate==null)
+    errors.AppendLine("Укажите дату поставки");
+  if(nameComboBox.SelectedDate==null)
+    errors.AppendLine("Укажите название магазина");
+  if (errors.Length >0)
+  {
+     MessageBox.Show(errors.ToString());
+     return;
+  }
+  Entities.GetContext().ShopAdd.Add(new ShopAdd()
+  {
+     Postavshik1 = postavschikComboBox.SelectedItem as Поставщик,
+     Name = nameComboBox.SeletedItem as Магазин,
+     Data = datatpostDatePicker.SelectrdDate.Value,
+    passed=false
+   });
+   Entities.GetContext().SaveChanges();
+   ((Window1)this.Owner).UpdateData();
+   MessageBox.Show("Данные успешно добавлены");
+   this.Close();
+
+}
+
+
+4
+<Button x:Name="delete_btn" IsEnabled="False" Content="///" HorizontalAlignment="Left"  Margin=684,424,0,0" VerticalAlignment="Top" Width="98" Height="26"/>
+
+5
+private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+ {
+ delete_btn.IsEnabled=true;
+ }
+
+
+
+6
+private void Delete_btn_Click(object sender, RoutedEventArgs e)
+ {
+     MessageBoxResult messageBoxResult =MessageBox.Show("Вы действительно хотите удалить запись?", "Удаление записи", MessageBoxButton.YesNo);
+     if(messageBoxResult == MessageBoxResult.Yes)
+     {
+         int id=(int)TypeDescriptor.GetProperties(dataGrid.SelectedItem)[0].GetValue(dataGrid.SelectedItem);
+         ///
+     }
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
